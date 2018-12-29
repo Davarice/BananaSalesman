@@ -9,7 +9,7 @@ class Commands:
     def get_command(self, kword):
         return getattr(self, kword, None)
 
-    def authenticate(self, *_):
+    def authenticate(self, msg, *_):
         """
         Take a Discord message and return True if:
           1. The author of the message is allowed to access this package
@@ -17,4 +17,5 @@ class Commands:
         Should be overwritten by modules providing secure functions
         (For example, moderation tools)
         """
-        return True
+        if "moderator/1" in msg.flags["badges"] or "broadcaster/1" in msg.flags["badges"] or msg.nickname in self.config.devs:
+            return True
