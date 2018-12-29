@@ -152,10 +152,10 @@ class CommandRouter:
             if not src:
                 # But if no source message is provided, fail
                 raise ValueError(
-                    "CommandRouter.run() must take a string and/or a source Discord message"
+                    "CommandRouter.run() must take a string and/or a source message"
                 )
             else:
-                string = src.content
+                string = src.message
 
         prefix = self.config.prefix
         if string.startswith(prefix):
