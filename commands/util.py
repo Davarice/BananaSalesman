@@ -2,10 +2,7 @@ from . import core
 
 
 class CommandsUtil(core.Commands):
-    def echo(self, text, *a, src, **kw):
-        return "{} said '{}'".format(src.nickname, text)
-
-    def echo2(self, text, *a, loud=False, src, **kw):
+    def echo(self, text, *a, loud=False, src, **kw):
         if loud is True:
             return "{} said '{}'".format(src.nickname, text.upper())
         else:

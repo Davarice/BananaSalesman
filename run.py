@@ -1,5 +1,5 @@
-import time
 import sys
+import time
 
 from twitchobserver import Observer
 
@@ -18,11 +18,18 @@ class Bot:
         self.config = config
         self.commands = commands.CommandRouter(self)
 
+        self.auction = None
+        self.lastout = ""
+
     def process_event(self, event):
-        # print(event)
         if event.type == "TWITCHCHATMESSAGE":
             retval = self.commands.run(src=event)
-            if retval:
+            if retval and type(retval) == str:
+                retval = retval.format(
+                    channel=event.channel,
+                    author=event.tags["display-name"],
+                    original=event.message,
+                )
                 self.client.send_message(retval, event.channel)
 
     def process_all(self):
@@ -30,10 +37,14 @@ class Bot:
             self.process_event(event)
 
     def send(self, text, dest=None):
-        self.client.send_message(text, dest or channel)
+        out = str(text).strip()
+        if out and out != self.lastout:
+            self.lastout = out
+            self.client.send_message(out, dest or channel)
 
 
 def run():
+    global bot
     bot = Bot(username, oauth)
     bot.client.start()
     bot.client.join_channel(channel)
@@ -41,8 +52,12 @@ def run():
 
     while True:
         try:
-            bot.process_all()
             time.sleep(bot.config.refresh)
+
+            bot.process_all()
+            if bot.auction:
+                bot.auction.check()
+
         except KeyboardInterrupt:
             print("Closing down...")
             break

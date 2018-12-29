@@ -132,9 +132,9 @@ class CommandRouter:
         # Find the method
         engine, func = self.find_command(command_word)
         if not func:
-            return "Command '{}' not found.".format(command_word)
+            return #"Command '{}' not found.".format(command_word)
         elif not engine.authenticate(src):
-            return "Authentication failure."
+            return #"Authentication failure."
         else:
             # Parse it
             text, flags = self.parse(command_components)
