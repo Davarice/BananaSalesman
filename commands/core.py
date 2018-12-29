@@ -17,5 +17,9 @@ class Commands:
         Should be overwritten by modules providing secure functions
         (For example, moderation tools)
         """
-        if "moderator/1" in msg.flags["badges"] or "broadcaster/1" in msg.flags["badges"] or msg.nickname in self.config.devs:
+        if (
+            "moderator/1" in msg.tags["badges"]
+            or "broadcaster/1" in msg.tags["badges"]
+            or msg.nickname in self.config.devs
+        ):
             return True
