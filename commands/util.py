@@ -3,13 +3,13 @@ from . import core
 
 class CommandsUtil(core.Commands):
     def echo(self, text, *a, src, **kw):
-        print(text)
+        return "{} said '{}'".format(src.nickname, text)
 
     def echo2(self, text, *a, loud=False, src, **kw):
-        if loud:
-            print(text.upper())
+        if loud is True:
+            return "{} said '{}'".format(src.nickname, text.upper())
         else:
-            print(text)
+            return "{} said '{}'".format(src.nickname, text)
 
 
 # Keep the actual classname unique from this common identifier
