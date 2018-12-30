@@ -5,7 +5,9 @@ refresh = 0.1
 
 class Msg:
     preface = (
-        "The Auction will run for {auction_length} seconds. Focus on chat and not any 'live' video since there might be a slight delay."
+        "The Auction will run for {auction_length} seconds."
+        + " Enter a bid by posting '{}bid <amount>'.".format(prefix)
+        + " Focus on chat and not any 'live' video of the chat since there might be a slight delay."
         # + " I will confirm bids in chat."
         # + " I will do a final 5,4,3,2,1,0 countdown after which the auction is over."
         + " The person with the highest bid will be declared the winner and they will have to tip that amount to claim their prize. Bidding starts at ${bid_initial}."
