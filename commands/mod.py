@@ -12,7 +12,9 @@ class CommandsMod(core.Commands):
         try:
             minimum = int(m or minimum)
         except:
-            return "Minimum must be an integer number of USD."
+            return "Minimum must be an integer number of {}.".format(
+                self.client.config.Currency.name_short
+            )
         auction = self.client.auction
         if text.lower() == "start":
             if auction:
@@ -20,8 +22,7 @@ class CommandsMod(core.Commands):
             else:
                 self.client.send(
                     self.config.Msg.preface.format(
-                        auction_length=time,
-                        bid_initial=minimum
+                        auction_length=time, bid_initial=minimum
                     )
                 )
                 auction = auctions.Auction(self.client, minimum, time)

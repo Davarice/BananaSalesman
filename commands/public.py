@@ -7,9 +7,11 @@ class CommandsPublic(core.Commands):
         if not auction:
             return "There is not currently an auction running."
         elif not text.isdigit():
-            return "A bid must be an integer number of USD."
+            return "A bid must be an integer number of {}.".format(
+                self.client.config.Currency.name_short
+            )
         else:
-            bid = int(text)
+            bid = int(text.strip(self.client.config.Currency.symbol))
             bidder = src.nickname
             auction.bid(bid, bidder)
 
