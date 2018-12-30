@@ -126,7 +126,12 @@ class CommandRouter:
         """
         # 'ban badperson666 evilness'
         # Separate the first word from the rest
-        command_word, command_components = command.split(" ", 1)
+        command_components = command.split(" ", 1)
+        if len(command_components) > 1:
+            command_word, command_components = command_components
+        else:
+            command_word = command_components[0]
+            command_components = ""
         # 'ban'; 'badperson666 evilness'
 
         # Find the method
