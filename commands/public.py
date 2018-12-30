@@ -15,7 +15,7 @@ class CommandsPublic(core.Commands):
             bidder = src.nickname
             auction.bid(bid, bidder)
 
-    def authenticate(self, msg, *_):
+    def __authenticate__(self, msg, *_):
         return True
 
 

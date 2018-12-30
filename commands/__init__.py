@@ -19,13 +19,13 @@ import functools
 import importlib
 
 @functools.lru_cache(maxsize=None)
-def get_command(name, *args, **kwargs):
+def __get_command__(name, *args, **kwargs):
     mod = importlib.import(name)
     return mod.CommandModule(*args, **kwargs)
 
 
 _commands = dict()
-def get_command(name, *args, **kwargs):
+def __get_command__(name, *args, **kwargs):
     if name in _commands:
         return _commands[name]
 
@@ -56,7 +56,7 @@ class CommandRouter:
         Find and return a class method whose name matches kword
         """
         for mod in self.commands:
-            func = mod.get_command(kword)
+            func = mod.__get_command__(kword)
             if not func:
                 continue
             else:
@@ -138,7 +138,7 @@ class CommandRouter:
         engine, func = self.find_command(command_word)
         if not func:
             return #"Command '{}' not found.".format(command_word)
-        elif not engine.authenticate(src):
+        elif not engine.__authenticate__(src):
             return #"Authentication failure."
         else:
             # Parse it

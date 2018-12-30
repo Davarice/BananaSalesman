@@ -6,10 +6,12 @@ class Commands:
         self.args = a  # Save for later
         self.kwargs = kw  # Just in case
 
-    def get_command(self, kword):
-        return getattr(self, kword, None)
+    def __get_command__(self, kword):
+        if "__" not in kword:
+            # Deny existence of any __methods__
+            return getattr(self, kword, None)
 
-    def authenticate(self, msg, *_):
+    def __authenticate__(self, msg, *_):
         """
         Take a Discord message and return True if:
           1. The author of the message is allowed to access this package
