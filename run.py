@@ -1,5 +1,4 @@
 import sys
-import time
 
 from twitchio.ext import commands as twitch
 
@@ -25,7 +24,7 @@ interface = twitch.Bot(
 
 
 class Bot:
-    def __init__(self, name, token):
+    def __init__(self):
         self.client = interface
         self.config = config
         self.commands = commands.CommandRouter(self)
@@ -41,7 +40,7 @@ class Bot:
             await dest.send(out)
 
 
-bot = Bot(username, oauth)
+bot = Bot()
 
 
 # Register an event with the interface
