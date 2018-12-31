@@ -2,7 +2,7 @@ from . import core
 
 
 class CommandsPublic(core.Commands):
-    def bid(self, text, *a, src, **kw):
+    async def cmd_bid(self, text, *a, src, **kw):
         auction = self.client.auction
         if not auction:
             return "There is not currently an auction running."
@@ -12,7 +12,7 @@ class CommandsPublic(core.Commands):
             )
         else:
             bid = int(text.strip(self.client.config.Currency.symbol))
-            bidder = src.nickname
+            bidder = src.author.name
             auction.bid(bid, bidder)
 
     def __authenticate__(self, msg, *_):

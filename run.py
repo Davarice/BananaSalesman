@@ -1,70 +1,74 @@
 import sys
 import time
 
-from twitchobserver import Observer
+from twitchio.ext import commands as twitch
 
 import commands
 import config
 
 
 username = sys.argv[1]
-oauth = sys.argv[2]
-channel = sys.argv[3]
+client_key = sys.argv[2]
+oauth = sys.argv[3]
+channel = sys.argv[4]
+
+
+# api token can be passed as test if not needed.
+# Channels is the initial channels to join, this could be a list, tuple or callable
+interface = twitch.Bot(
+    irc_token=oauth,
+    client_id=client_key,
+    nick=username,
+    prefix=config.prefix,
+    initial_channels=[channel]
+)
 
 
 class Bot:
     def __init__(self, name, token):
-        self.client = Observer(name, token)
+        self.client = interface
         self.config = config
         self.commands = commands.CommandRouter(self)
 
         self.auction = None
         self.lastout = ""
 
-    def process_event(self, event):
-        if event.type == "TWITCHCHATMESSAGE":
-            retval = self.commands.run(src=event)
-            if retval and type(retval) == str:
-                retval = retval.format(
-                    channel=event.channel,
-                    author=event.tags["display-name"],
-                    original=event.message,
-                )
-                self.client.send_message(retval, event.channel)
-
-    def process_all(self):
-        for event in self.client.get_events():
-            self.process_event(event)
-
-    def send(self, text, dest=None):
+    async def send(self, text, dest):
         out = str(text).strip()
         if out and out != self.lastout:
             self.lastout = out
-            self.client.send_message(out, dest or channel)
+            print(out)
+            await dest.send(out)
 
 
-def run():
-    global bot
-    bot = Bot(username, oauth)
-    bot.client.start()
-    bot.client.join_channel(channel)
-    print("Channel {} joined".format(channel))
+bot = Bot(username, oauth)
 
-    while True:
-        try:
-            time.sleep(bot.config.refresh)
 
-            bot.process_all()
-            if bot.auction:
-                bot.auction.check()
+# Register an event with the interface
+@interface.event
+async def event_ready():
+    print(f'Ready | {interface.nick}')
 
-        except KeyboardInterrupt:
-            print("Closing down...")
-            break
 
-    bot.client.leave_channel(channel)
-    bot.client.stop()
+@interface.event
+async def event_message(message):
+    print(str(message.author) + " -> " + message.content)
+
+    retval = await bot.commands.run(src=message)
+    if retval and type(retval) == str:
+        retval = retval.format(
+            channel=message.channel.name,
+            author=message.tags["display-name"],
+            original=message.content,
+        )
+        await bot.send(retval, message.channel)
+
+
+# Register a command with the bot
+@interface.command(name='test', aliases=['t'])
+async def test_command(ctx):
+    await ctx.send(f'Hello {ctx.author.name}')
 
 
 if __name__ == "__main__":
-    run()
+    bot.client.run()

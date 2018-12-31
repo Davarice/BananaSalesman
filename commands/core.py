@@ -9,7 +9,7 @@ class Commands:
     def __get_command__(self, kword):
         if "__" not in kword:
             # Deny existence of any __methods__
-            return getattr(self, kword, None)
+            return getattr(self, "cmd_" + kword, None)
 
     def __authenticate__(self, msg, *_):
         """
@@ -22,6 +22,6 @@ class Commands:
         if (
             "moderator/1" in msg.tags["badges"]
             or "broadcaster/1" in msg.tags["badges"]
-            or msg.nickname in self.config.devs
+            or msg.author in self.config.devs
         ):
             return True

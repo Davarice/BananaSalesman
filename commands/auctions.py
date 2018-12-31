@@ -1,4 +1,5 @@
 import datetime as dt
+import asyncio
 
 
 def timeformat(seconds):
@@ -15,10 +16,11 @@ def timeformat(seconds):
 
 
 class Auction:
-    def __init__(self, host, minimum, time):
+    def __init__(self, host, minimum, time, channel):
         self.host = host
         self.minimum = minimum
         self.time = time
+        self.channel = channel
 
         self.bids = {}
         self.ticker = 0
@@ -32,23 +34,28 @@ class Auction:
         if bid > lastbid:
             self.bids[bidder] = bid
 
-    def run(self):
-        self.host.send(self.host.config.Msg.start)
-        self.started = dt.datetime.utcnow()
-
-    def check(self):
-        if self.stopped:
-            self.stop()
-        elif dt.datetime.utcnow() > self.started + dt.timedelta(seconds=self.time):
-            self.end()
-
     def top(self):
         if self.bids:
             top_value = max(self.bids.values())
             winners = [x for x in self.bids.keys() if self.bids[x] == top_value]
             return winners, top_value
 
-    def finish(self):
+    async def run(self):
+        self.ticker = 0
+        self.started = dt.datetime.utcnow()
+
+        await self.host.send(self.host.config.Msg.start, self.channel)
+        while self.ticker < self.time and not self.stopped:
+            await asyncio.sleep(1)
+            self.ticker += 1
+            left = self.time - self.ticker
+
+        if self.stopped:
+            await self.stop()
+        else:
+            await self.end()
+
+    async def finish(self):
         self.host.auction = None
         results = self.top()
         if not results:
@@ -58,12 +65,12 @@ class Auction:
             phrase = self.host.config.Msg.results_one
         else:
             phrase = self.host.config.Msg.results_tie
-        self.host.send(phrase.format(winners=results[0],price=results[1]))
+        await self.host.send(phrase.format(winners=results[0],price=results[1]), self.channel)
 
-    def end(self):
-        self.host.send(self.host.config.Msg.end)
-        self.finish()
+    async def end(self):
+        await self.host.send(self.host.config.Msg.end, self.channel)
+        await self.finish()
 
-    def stop(self):
-        self.host.send(self.host.config.Msg.stop)
-        self.finish()
+    async def stop(self):
+        await self.host.send(self.host.config.Msg.stop, self.channel)
+        await self.finish()

@@ -2,7 +2,7 @@ from . import auctions, core
 
 
 class CommandsMod(core.Commands):
-    def auction(self, text, *a,
+    async def cmd_auction(self, text, *a,
                 minimum=5, m=None, time=300, t=None,
                 src, **kw):
         try:
@@ -20,14 +20,15 @@ class CommandsMod(core.Commands):
             if auction:
                 return "An auction is already running."
             else:
-                self.client.send(
+                await self.client.send(
                     self.config.Msg.preface.format(
                         auction_length=time, bid_initial=minimum
-                    )
+                    ),
+                    src.channel
                 )
-                auction = auctions.Auction(self.client, minimum, time)
+                auction = auctions.Auction(self.client, minimum, time, src.channel)
                 self.client.auction = auction
-                auction.run()
+                await auction.run()
         elif text.lower() == "stop":
             if not auction:
                 return "No auction is currently running."

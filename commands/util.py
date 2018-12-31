@@ -2,11 +2,11 @@ from . import core
 
 
 class CommandsUtil(core.Commands):
-    def echo(self, text, *a, loud=False, src, **kw):
+    async def cmd_echo(self, text, *a, loud=False, src, **kw):
         if loud is True:
-            return "{} said '{}'".format(src.nickname, text.upper())
+            return "{} said '{}'".format(src.author.name, text.upper())
         else:
-            return "{} said '{}'".format(src.nickname, text)
+            return "{} said '{}'".format(src.author.name, text)
 
 
 # Keep the actual classname unique from this common identifier
