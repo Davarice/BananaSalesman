@@ -31,6 +31,7 @@ class Auction:
         self.minimum = minimum
         self.time = time
         self.channel = channel
+        self.highest = minimum
 
         self.bids = {}
         self.bidseq = []
@@ -43,8 +44,13 @@ class Auction:
             return
         lastbid = self.bids.get(bidder, 0)
         if bid > lastbid:
+            if bid > self.host.config.raise_limit + self.highest:
+                # await self.host.send("I doubt you have that much money, {}.".format(bidder))
+                return "You cannot raise by that much, {}.".format(bidder)
             self.bids[bidder] = bid
             self.bidseq.append(Bid(bidder, bid))
+            if bid > self.highest:
+                self.highest = bid
             if self.time - self.ticker < self.host.config.helmet:
                 self.time += self.host.config.helmet
             return True

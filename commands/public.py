@@ -14,8 +14,10 @@ class CommandsPublic(core.Commands):
             bid = int(text.strip(self.client.config.Currency.symbol))
             bidder = src.author.name
             ret = auction.bid(bid, bidder)
-            if ret:
+            if ret is True:
                 await self.client.send("{} has bid {}.".format(bidder, self.client.config.Currency.quantity.format(bid)), src.channel)
+            elif ret:
+                await self.client.send(ret, src.channel)
 
     def __authenticate__(self, msg, *_):
         return True

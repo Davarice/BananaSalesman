@@ -135,7 +135,7 @@ class CommandRouter:
         # 'ban'; 'badperson666 evilness'
 
         # Find the method
-        engine, func = self.find_command(command_word)
+        engine, func = self.find_command("cmd_" + command_word)
         if not func:
             return #"Command '{}' not found.".format(command_word)
         elif not engine.__authenticate__(src):
