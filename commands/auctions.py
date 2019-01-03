@@ -8,9 +8,9 @@ def timeformat(seconds):
     else:
         p = ""
     if seconds >= 7200:
-        return seconds/3600, "hour" + p
+        return seconds / 3600, "hour" + p
     elif seconds >= 120:
-        return seconds/60, "minute" + p
+        return seconds / 60, "minute" + p
     else:
         return seconds, "second" + p
 
@@ -31,7 +31,7 @@ class Auction:
         self.minimum = minimum
         self.time = time
         self.channel = channel
-        self.highest = minimum
+        self.highest = 0
 
         self.bids = {}
         self.bidseq = []
@@ -42,10 +42,10 @@ class Auction:
     def bid(self, bid, bidder):
         if bid < self.minimum:
             return
-        lastbid = self.bids.get(bidder, 0)
-        if bid > lastbid:
+        # lastbid = self.bids.get(bidder, 0)
+        # if bid > lastbid:
+        if bid > self.highest:
             if bid > self.host.config.raise_limit + self.highest:
-                # await self.host.send("I doubt you have that much money, {}.".format(bidder))
                 return "You cannot raise by that much, {}.".format(bidder)
             self.bids[bidder] = bid
             self.bidseq.append(Bid(bidder, bid))
@@ -54,6 +54,10 @@ class Auction:
             if self.time - self.ticker < self.host.config.helmet:
                 self.time += self.host.config.helmet
             return True
+        else:
+            return "The current bid to beat is {}.".format(
+                self.host.config.Currency.quantity.format(self.highest)
+            )
 
     def top(self):
         if self.bids:
@@ -80,7 +84,9 @@ class Auction:
             self.ticker += 1
             left = self.time - self.ticker
             if left in self.host.config.important_seconds:
-                await self.host.send(self.host.config.Msg.timer.format(left, "seconds"), self.channel)
+                await self.host.send(
+                    self.host.config.Msg.timer.format(left, "seconds"), self.channel
+                )
 
         if self.stopped:
             await self.stop()
@@ -97,7 +103,9 @@ class Auction:
             phrase = self.host.config.Msg.results_one
         else:
             phrase = self.host.config.Msg.results_tie
-        await self.host.send(phrase.format(winners=results[0],price=results[1]), self.channel)
+        await self.host.send(
+            phrase.format(winners=results[0], price=results[1]), self.channel
+        )
 
     async def end(self):
         await self.host.send(self.host.config.Msg.end, self.channel)
